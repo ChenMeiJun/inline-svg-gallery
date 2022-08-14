@@ -3,7 +3,7 @@ import { parse, extname, join, basename } from 'path';
 import { readdirSync, Dirent, statSync, Stats } from 'fs';
 
 import Gallery from './Gallery';
-import { EXT_SVG, EXCLUDE, VIEW_TYPE, TEXT_MULTIPLE_FILES } from './constant';
+import { EXT_SVG_LIST, EXCLUDE, VIEW_TYPE, TEXT_MULTIPLE_FILES } from './constant';
 
 import GALLERY_TPL from './templates/gallery.ejs';
 
@@ -22,7 +22,7 @@ abstract class AbstractGallery {
     if (webViewPanel) {
       webViewPanel.reveal();
     } else {
-      webViewPanel = this.createWebviewPanel(`${this.generateWebviewPanelTitle()} - SVG Gallery`);
+      webViewPanel = this.createWebviewPanel(`${this.generateWebviewPanelTitle()} - Inline SVG Gallery`);
       this.context.subscriptions.push(webViewPanel.onDidChangeViewState((e: vscode.WebviewPanelOnDidChangeViewStateEvent) => {
         if (e.webviewPanel.visible) { this.refreshWebview(e.webviewPanel); }
       }));
@@ -59,7 +59,9 @@ abstract class AbstractGallery {
       { enableScripts: true, enableFindWidget: true }
     );
   }
-
+  // The task 'npm: watch' cannot be tracked. Make sure to have a problem matcher defined.
+  // The terminal process "/bin/zsh '-c', 'npm run watch'" terminated with exit code: 1.
+  
   private refreshWebview(webviewPanel: vscode.WebviewPanel): void {
     const webview = webviewPanel.webview;
     const gallery: Gallery = new Gallery(GALLERY_TPL, webview, this.generateGalleryData());
@@ -108,37 +110,37 @@ class FolderGallery extends AbstractGallery {
   }
 
   protected generateGalleryData(): Map<string, string[]> {
-    return this.findFilesByExt(this.v.fsPath, EXT_SVG);
+    return this.findFilesByExt(this.v.fsPath, EXT_SVG_LIST);
   }
 
-  private findFilesByExt(path: string, ext: string): Map<string, string[]> {
+  private findFilesByExt(path: string, exts: string[]): Map<string, string[]> {
     let result: Map<string, string[]> = new Map();
 
     if (EXCLUDE.has(basename(path))) { return result; };
 
     const ds: Dirent[] = readdirSync(path, { withFileTypes: true });
-    const files = this.filterByExt(ds, ext).map(e => join(path, e.name));
+    const files = this.filterByExt(ds, exts).map(e => join(path, e.name));
     if (files.length) { result.set(path, files); }
     ds.filter(d => d.isDirectory()).forEach(d => {
-      result = new Map([...result, ...this.findFilesByExt(join(path, d.name), ext)]);
+      result = new Map([...result, ...this.findFilesByExt(join(path, d.name), exts)]);
     });
     return result;
   }
 
-  private filterByExt(ds: Dirent[], ext: string): Dirent[] {
-    return ds.filter(d => d.isFile() && extname(d.name).toLocaleLowerCase() === ext);
+  private filterByExt(ds: Dirent[], exts: string[]): Dirent[] {
+    return ds.filter(d => d.isFile() &&  exts.includes(extname(d.name).toLocaleLowerCase()));
   }
 }
 
 // this method is called when your extension is activated
 export function activate(context: vscode.ExtensionContext) {
 
-  console.log('Congratulations, your extension "SVG Gallery" is now active!');
+  console.log('Congratulations, your extension "Inline SVG Gallery" is now active!');
 
   const webviewPanels: Map<string, vscode.WebviewPanel> = new Map();
-  const regexp: RegExp = /.+\.svg$/i;
+  const regexp: RegExp = /.+\.(svg|tsx)$/i;
 
-  context.subscriptions.push(vscode.commands.registerCommand('SVGGallery.open', (item: any, items: any[]) => {
+  context.subscriptions.push(vscode.commands.registerCommand('InlineSVGGallery.open', (item: any, items: any[]) => {
     const selectedFiles: any[] = [];
     const selectedFolders: any[] = [];
     (items && items.length ? items : [item]).forEach((item: any) => {

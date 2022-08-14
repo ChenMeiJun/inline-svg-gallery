@@ -14,8 +14,9 @@ export default class Section {
 
   generateHtml(): string {
     const o: ParsedPath = parse(this.path);
+    const path = normalize(join(o.root.toUpperCase(), o.dir.replace(o.root, ''), o.base));
     return ejs.render(this.tpl, {
-      path: normalize(join(o.root.toUpperCase(), o.dir.replace(o.root, ''), o.base)),
+      path,
       files: this.files.map(e => new SVGFile(this.webview, e))
     });
   }

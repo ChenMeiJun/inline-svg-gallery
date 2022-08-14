@@ -1,4 +1,4 @@
-export const EXT_SVG: string = '.svg';
+export const EXT_SVG_LIST: string[] = ['.svg', '.jsx', '.tsx', '.js', '.html', '.vue'];
 export const EXCLUDE: Set<string> = new Set([
   'node_modules'
 ]);

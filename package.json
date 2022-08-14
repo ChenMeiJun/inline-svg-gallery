@@ -1,9 +1,9 @@
 {
   "name": "svg-gallery",
-  "displayName": "SVG Gallery",
+  "displayName": "Inline SVG Gallery",
   "description": "View SVG images in gallery",
-  "version": "2.1.0",
-  "publisher": "developer2006",
+  "version": "1.0.0",
+  "publisher": "chenmeijun",
   "icon": "images/logo.png",
   "engines": {
     "vscode": "^1.43.0"
@@ -27,30 +27,30 @@
   "contributes": {
     "commands": [
       {
-        "command": "SVGGallery.open",
-        "title": "Open in SVG Gallery",
+        "command": "InlineSVGGallery.open",
+        "title": "Open in Inline SVG Gallery",
         "category": "File"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "SVGGallery.open",
-          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.svg$/i"
+          "command": "InlineSVGGallery.open",
+          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|tsx)$/i"
         }
       ],
       "explorer/context": [
         {
-          "command": "SVGGallery.open",
-          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.svg$/i",
-          "group": "SVGGallery@1"
+          "command": "InlineSVGGallery.open",
+          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|tsx)$/i",
+          "group": "InlineSVGGallery@1"
         }
       ],
       "editor/context": [
         {
-          "command": "SVGGallery.open",
-          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.svg$/i",
-          "group": "SVGGallery@1"
+          "command": "InlineSVGGallery.open",
+          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|tsx)$/i",
+          "group": "InlineSVGGallery@1"
         }
       ]
     }
@@ -80,7 +80,7 @@
     "lodash": "^4.17.15",
     "uuid": "^8.0.0"
   },
-  "author": "Yongjian Huang",
+  "author": "Yongjian Huang + Meijun Chen",
   "license": "MIT",
   "homepage": "https://github.com/codelab2006/svg-gallery#readme",
   "repository": {

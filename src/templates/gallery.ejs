@@ -1,96 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>SVG Gallery</title>
-    <%- style %>
-  </head>
-  <body>
-    <% if (!sections.length) { %>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Inline SVG Gallery</title>
+  <%- style %>
+</head>
+
+<body>
+  <% if (!sections.length) { %>
     <p class="padding-2" id="no-results-found">No SVGs found</p>
     <% } else { %>
-    <div id="gallery-container">
-      <div class="fg-1"></div>
-      <input class="d-none" type="radio" id="light-frame" name="image-frame" />
-      <div class="p-relative frame-label-container">
-        <button id="light-frame-label" class="frame-label">Light</button>
-        <div class="flag"></div>
+      <div id="gallery-container">
+        <div class="fg-1"></div>
+        <input class="d-none" type="radio" id="light-frame" name="image-frame" />
+        <div class="p-relative frame-label-container">
+          <button id="light-frame-label" class="frame-label">Light</button>
+          <div class="flag"></div>
+        </div>
+        <input class="d-none" type="radio" id="dark-frame" name="image-frame" />
+        <div class="p-relative frame-label-container">
+          <button id="dark-frame-label" class="frame-label">Dark</button>
+          <div class="flag"></div>
+        </div>
+        <div class="fg-1 d-flex-row-end padding-right-4">
+          <button id="refresh" title="Refresh gallery" onclick="refresh(this)" class="d-flex-column-center padding-2">
+            <svg class="bi bi-arrow-clockwise" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd"
+                d="M3.17 6.706a5 5 0 017.103-3.16.5.5 0 10.454-.892A6 6 0 1013.455 5.5a.5.5 0 00-.91.417 5 5 0 11-9.375.789z"
+                clip-rule="evenodd" />
+              <path fill-rule="evenodd"
+                d="M8.147.146a.5.5 0 01.707 0l2.5 2.5a.5.5 0 010 .708l-2.5 2.5a.5.5 0 11-.707-.708L10.293 3 8.147.854a.5.5 0 010-.708z"
+                clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <ul class="gallery">
+          <%_ sections.forEach((e)=> { _%>
+            <li>
+              <%- e %>
+            </li>
+            <%_ }) _%>
+        </ul>
       </div>
-      <input class="d-none" type="radio" id="dark-frame" name="image-frame" />
-      <div class="p-relative frame-label-container">
-        <button id="dark-frame-label" class="frame-label">Dark</button>
-        <div class="flag"></div>
-      </div>
-      <div class="fg-1 d-flex-row-end padding-right-4">
-        <button
-          id="refresh"
-          title="Refresh gallery"
-          onclick="refresh(this)"
-          class="d-flex-column-center padding-2"
-        >
-          <svg
-            class="bi bi-arrow-clockwise"
-            width="1em"
-            height="1em"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M3.17 6.706a5 5 0 017.103-3.16.5.5 0 10.454-.892A6 6 0 1013.455 5.5a.5.5 0 00-.91.417 5 5 0 11-9.375.789z"
-              clip-rule="evenodd"
-            />
-            <path
-              fill-rule="evenodd"
-              d="M8.147.146a.5.5 0 01.707 0l2.5 2.5a.5.5 0 010 .708l-2.5 2.5a.5.5 0 11-.707-.708L10.293 3 8.147.854a.5.5 0 010-.708z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </button>
-      </div>
-      <ul class="gallery">
-        <%_ sections.forEach((e) => { _%>
-        <li><%- e %></li>
-        <%_ }) _%>
-      </ul>
-    </div>
-    <script>
-      const vscode = acquireVsCodeApi();
-      const lightFrameId = "#light-frame";
-      const darkFrameId = "#dark-frame";
+      <script>
+        const vscode = acquireVsCodeApi();
+        const lightFrameId = "#light-frame";
+        const darkFrameId = "#dark-frame";
 
-      const refresh = () => {
-        vscode.postMessage({ command: "REFRESH" });
-      };
+        const refresh = () => {
+          vscode.postMessage({ command: "REFRESH" });
+        };
 
-      const themeCallback = (inputId) => {
-        document.querySelector(inputId).click();
-        vscode.setState({ frameId: inputId });
-      };
-      document.querySelector("#light-frame-label").onclick = () => {
-        themeCallback(lightFrameId);
-      };
-      document.querySelector("#dark-frame-label").onclick = () => {
-        themeCallback(darkFrameId);
-      };
-      document.querySelector("#gallery-container").onclick = ({
-        target: {
-          dataset: { path },
-        },
-      }) => {
-        if (path) {
-          vscode.postMessage({ command: "OPEN_FILE", args: { path: path } });
+        const themeCallback = (inputId) => {
+          document.querySelector(inputId).click();
+          vscode.setState({ frameId: inputId });
+        };
+        document.querySelector("#light-frame-label").onclick = () => {
+          themeCallback(lightFrameId);
+        };
+        document.querySelector("#dark-frame-label").onclick = () => {
+          themeCallback(darkFrameId);
+        };
+        document.querySelector("#gallery-container").onclick = ({
+          target: {
+            dataset: { path },
+          },
+        }) => {
+          if (path) {
+            vscode.postMessage({ command: "OPEN_FILE", args: { path: path } });
+          }
+        };
+
+        const { frameId } = vscode.getState() || {};
+        if (frameId) {
+          themeCallback(frameId);
+        } else {
+          themeCallback(lightFrameId);
         }
-      };
+      </script>
+      <% } %>
+</body>
 
-      const { frameId } = vscode.getState() || {};
-      if (frameId) {
-        themeCallback(frameId);
-      } else {
-        themeCallback(lightFrameId);
-      }
-    </script>
-    <% } %>
-  </body>
 </html>
